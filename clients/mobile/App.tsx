@@ -1,0 +1,15 @@
+import { useEffect, useState } from 'react';
+import { Alert, Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Session } from '@supabase/supabase-js';
+import { supabase } from './lib/supabase';
+
+export default function App() {
+  const [session, setSession] = useState<Session | null>(null); const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [active, setActive] = useState(false);
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => setSession(data.session)); const { data: listener } = supabase.auth.onAuthStateChange((_e, next) => setSession(next)); return () => listener.subscription.unsubscribe(); }, []);
+  useEffect(() => { if (session) supabase.from('connection_sessions').select('id').is('ended_at', null).limit(1).then(({ data }) => setActive(Boolean(data?.length))); }, [session]);
+  const login = async () => { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) Alert.alert('Could not sign in', error.message); };
+  const toggle = async () => { if (!session) return; const query = active ? supabase.from('connection_sessions').update({ ended_at:new Date().toISOString() }).is('ended_at', null) : supabase.from('connection_sessions').insert({ user_id:session.user.id, server_location:'Ulaanbaatar, MN' }); const { error } = await query; if (error) Alert.alert('Could not update', error.message); else setActive(!active); };
+  if (!session) return <SafeAreaView style={s.screen}><Text style={s.brand}>• Nutag</Text><Text style={s.copy}>Sign in to your demo account.</Text><TextInput style={s.input} placeholder="Email" placeholderTextColor="#8c97ac" autoCapitalize="none" value={email} onChangeText={setEmail}/><TextInput style={s.input} placeholder="Password" placeholderTextColor="#8c97ac" secureTextEntry value={password} onChangeText={setPassword}/><Button title="Log in" onPress={login}/></SafeAreaView>;
+  return <SafeAreaView style={s.screen}><Text style={s.brand}>• Nutag</Text><Text style={s.copy}>{session.user.email}</Text><View style={s.card}><Text style={s.status}>{active ? '● Connected' : '● Disconnected'}</Text><Text style={s.copy}>Ulaanbaatar, Mongolia</Text><Button title={active ? 'Disconnect' : 'Connect'} onPress={toggle}/><Text style={s.note}>Demo state only. VPN traffic routing is coming soon.</Text></View><Button title="Log out" onPress={() => supabase.auth.signOut()}/></SafeAreaView>;
+}
+const s = StyleSheet.create({screen:{flex:1,backgroundColor:'#0f1a2b',padding:24,gap:16},brand:{color:'#edebe3',fontSize:28,fontWeight:'600'},copy:{color:'#8c97ac',lineHeight:21},input:{backgroundColor:'#16233a',borderColor:'#2a3b58',borderWidth:1,borderRadius:6,color:'#edebe3',padding:13},card:{backgroundColor:'#16233a',borderRadius:8,padding:22,gap:16},status:{color:'#4caf82',fontSize:20,fontWeight:'600'},note:{color:'#8c97ac',fontSize:13,lineHeight:19}});

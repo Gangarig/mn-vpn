@@ -21,3 +21,9 @@ The canonical schema is in `supabase/migrations/20260927000000_initial_schema.sq
 
 Paid subscriptions are deliberately not activated by the browser. A payment-webhook backend should create `active` subscription rows with a server-only/service-role credential.
 
+## Client foundations
+
+- `clients/extension` is a loadable Chrome/Edge Manifest V3 companion. It authenticates against Supabase and records the same demo connection sessions; it does **not** route browser traffic.
+- `clients/mobile` is an Expo foundation for Android and iPhone. Copy `.env.example` to `.env`, use the project publishable key, run `npm install`, then `npm run android` or `npm run ios`. It shares the Supabase demo session state.
+
+Real VPN traffic needs a WireGuard server/control plane and native platform integration before it can replace the demo Connect controls.
