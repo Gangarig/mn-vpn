@@ -21,6 +21,9 @@ form.addEventListener("submit", async (event) => {
   submitBtn.disabled = true;
   msg.textContent = "";
   try {
+    if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 10) {
+      throw new Error("Use a valid email and a password with at least 10 characters.");
+    }
     if (mode === "signup") {
       const { data, error } = await supabaseClient.auth.signUp({
         email,
@@ -46,4 +49,3 @@ form.addEventListener("submit", async (event) => {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) window.location.href = "dashboard.html";
 })();
-
