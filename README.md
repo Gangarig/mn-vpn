@@ -23,7 +23,7 @@ Paid subscriptions are deliberately not activated by the browser. A payment-webh
 
 ## Client foundations
 
-- `clients/extension` is a loadable Chrome/Edge Manifest V3 companion. It authenticates against Supabase and records the same demo connection sessions; it does **not** route browser traffic.
+- `clients/extension` is a standards-based WebExtension companion for Chrome, Edge, and Firefox (Safari wrapping comes later). It authenticates against Supabase and records the same demo connection sessions; it does **not** route browser traffic.
 - `clients/mobile` is an Expo foundation for Android and iPhone. Copy `.env.example` to `.env`, use the project publishable key, run `npm install`, then `npm run android` or `npm run ios`. It shares the Supabase demo session state.
 
 Real VPN traffic needs a WireGuard server/control plane and native platform integration before it can replace the demo Connect controls.
