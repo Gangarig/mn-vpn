@@ -4,3 +4,4 @@
 !.env.example
 work/
 clients/mobile/.expo/
+node_modules/
