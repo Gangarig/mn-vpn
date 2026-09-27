@@ -6,8 +6,8 @@ document.querySelectorAll("[data-plan]").forEach((button) => button.addEventList
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) { window.location.href = "auth.html"; return; }
   button.disabled = true;
-  const { error } = await supabaseClient.from("subscriptions").insert({ user_id: session.user.id, plan, status: "inactive" });
+  const { data, error } = await supabaseClient.functions.invoke("create-checkout-session", { body: { plan } });
   button.disabled = false;
-  showBanner(error ? "We couldn't record your interest. Please try again shortly." : `Noted — you’re interested in the ${plan} plan. Nothing has been charged.`);
+  if (error || !data?.url) { showBanner("We couldn't start secure checkout. Please try again shortly."); return; }
+  window.location.assign(data.url);
 }));
-
