@@ -17,7 +17,7 @@ export function json(body: unknown, status = 200) {
 export function stripe() {
   const key = Deno.env.get("STRIPE_SECRET_KEY");
   if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
-  return new Stripe(key);
+  return new Stripe(key, { apiVersion: "2025-03-31.basil" as Stripe.LatestApiVersion });
 }
 
 export function adminClient() {
