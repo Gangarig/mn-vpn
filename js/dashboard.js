@@ -40,6 +40,11 @@ async function loadPlan() {
   }
 }
 
+async function syncBilling() {
+  const { error } = await supabaseClient.functions.invoke("sync-billing-status");
+  if (error) console.warn("Billing status could not be refreshed yet.");
+}
+
 toggleBtn.addEventListener("click", async () => {
   if (!activeSessionId && !hasEntitlement) { window.location.href = "pricing.html"; return; }
   renderConnected(Boolean(activeSessionId), true);
@@ -66,5 +71,6 @@ logoutLink.addEventListener("click", async (event) => { event.preventDefault(); 
   if (!session) { window.location.href = "auth.html"; return; }
   currentUser = session.user;
   userEmailEl.textContent = currentUser.email;
+  await syncBilling();
   await Promise.all([loadSessions(), loadPlan()]);
 })();
