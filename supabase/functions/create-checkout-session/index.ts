@@ -32,5 +32,9 @@ Deno.serve(async (req) => {
     });
     if (!session.url) throw new Error("Stripe did not return a Checkout URL");
     return json({ url: session.url });
-  } catch (error) { console.error(error); return json({ error: "Unable to start checkout" }, 500); }
+  } catch (error) {
+    console.error(error);
+    const detail = Deno.env.get("STRIPE_SECRET_KEY")?.startsWith("sk_test_") && error instanceof Error ? error.message : undefined;
+    return json({ error: "Unable to start checkout", detail }, 500);
+  }
 });
