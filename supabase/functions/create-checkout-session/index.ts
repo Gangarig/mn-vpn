@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     return json({ url: session.url });
   } catch (error) {
     console.error(error);
-    const detail = Deno.env.get("STRIPE_SECRET_KEY")?.startsWith("sk_test_") && error instanceof Error ? error.message : undefined;
+    const detail = error instanceof Error ? error.message : undefined;
     return json({ error: "Unable to start checkout", detail }, 500);
   }
 });
