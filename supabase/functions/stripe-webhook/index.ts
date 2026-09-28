@@ -71,7 +71,8 @@ Deno.serve(async (req) => {
     return json({ received: true });
   } catch (error) {
     console.error(error);
-    await db.from("stripe_events").update({ status: "failed", error_message: error instanceof Error ? error.message.slice(0, 500) : "Unknown error" }).eq("stripe_event_id", event.id);
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    await db.from("stripe_events").update({ status: "failed", error_message: message.slice(0, 500) }).eq("stripe_event_id", event.id);
     return json({ error: "Webhook processing failed" }, 500);
   }
 });
