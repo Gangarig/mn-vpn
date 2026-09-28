@@ -8,6 +8,14 @@ document.querySelectorAll("[data-plan]").forEach((button) => button.addEventList
   button.disabled = true;
   const { data, error } = await supabaseClient.functions.invoke("create-checkout-session", { body: { plan } });
   button.disabled = false;
-  if (error || !data?.url) { showBanner(data?.detail || "We couldn't start secure checkout. Please try again shortly."); return; }
+  if (error || !data?.url) {
+    let message = data?.detail || "We couldn't start secure checkout. Please try again shortly.";
+    if (error?.context instanceof Response) {
+      const payload = await error.context.clone().json().catch(() => null);
+      message = payload?.detail || payload?.error || message;
+    }
+    showBanner(message);
+    return;
+  }
   window.location.assign(data.url);
 }));
